@@ -16,6 +16,7 @@ class MainScreen(Screen):
         layout = BoxLayout(orientation="vertical", spacing=10, padding=20)
 
         self.camera = Camera(play=True)
+        # self.camera.size = (640, 480) # размер камеры, у меня работает 640 480 в базе
         layout.add_widget(self.camera)
 
         self.button = Button(text="Сделать фото", size_hint=(1, 0.2))
