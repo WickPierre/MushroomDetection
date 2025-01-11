@@ -22,7 +22,9 @@ class MainScreen(Screen):
         self.button.bind(on_press=self.take_photo)
         layout.add_widget(self.button)
 
-        self.result_label = Label(text="", size_hint=(1, 0.2))
+        self.result_label = Label(
+            text="", size_hint=(1, 0.2)
+        )  # Нужно ввести итоговый результат в эту строку
         layout.add_widget(self.result_label)
 
         self.add_widget(layout)
