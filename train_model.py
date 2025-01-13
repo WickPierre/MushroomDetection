@@ -5,9 +5,10 @@ model = YOLO('yolo11n-cls.pt')  # Выберите размер модели: n,
 
 # Запускаем обучение
 model.train(
-    data='/Users/petrlutkin/Desktop/MushroomDetection/dataset/',
+    data='/Users/petrlutkin/Desktop/MushroomDetection/dataset_new/',
     epochs=20,
-    imgsz=520,
+    imgsz=512,
+    batch=32,
     device='mps',
-    save_dir='/Users/petrlutkin/Desktop/MushroomDetection/result',
+    project='/Users/petrlutkin/Desktop/MushroomDetection/result'
 )

@@ -1,9 +1,9 @@
 from ultralytics import YOLO
 
 
-model = YOLO('best.pt')
+model = YOLO('/Users/petrlutkin/Desktop/MushroomDetection/result/train2/weights/best.pt')
 
 results1 = model.predict(
-    source='img_1.png',
+    source='img_3.png',
     save=True
 )
