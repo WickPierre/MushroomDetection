@@ -1,4 +1,7 @@
 # created by virtualenv automatically
 .venv
 dataset
+dataset_new
 .idea
+photos
+processed_photos
