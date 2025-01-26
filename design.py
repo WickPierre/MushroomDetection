@@ -13,8 +13,7 @@ import os
 import cv2
 from ultralytics import YOLO
 
-
-Window.clearcolor = get_color_from_hex("#1e1e1e")
+Window.clearcolor = get_color_from_hex("#000000")
 
 
 class RoundedButton(ButtonBehavior, Label):
@@ -39,48 +38,44 @@ class RoundedButton(ButtonBehavior, Label):
         self.rect.pos = self.pos
 
 
-class MainScreen(Screen):
+class MainMenuScreen(Screen):  # Первый экран, пока что с 2 кнопками
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        layout = BoxLayout(orientation="vertical", spacing=20, padding=[10, 20, 10, 20])
+        layout = BoxLayout(orientation="vertical", padding=20, spacing=20)
 
-        camera_box = BoxLayout(size_hint=(1, 0.8), padding=0)
-        self.camera = Camera(play=True)
+        history_button = RoundedButton(text="История распознавания")
+        recognize_button = RoundedButton(text="Распознать гриб")
 
-        with camera_box.canvas.before:
-            Color(*get_color_from_hex("#2d2d2d"))
-            self.camera_frame = RoundedRectangle(radius=[10])
+        recognize_button.bind(on_press=self.go_to_camera)
 
-        camera_box.add_widget(self.camera)
-        self.camera.bind(pos=self.update_camera_frame, size=self.update_camera_frame)
-        layout.add_widget(camera_box)
-
-        self.button = RoundedButton(text="Сделать фото")
-        self.button.bind(on_press=self.take_photo)
-
-        button_container = BoxLayout(size_hint=(1, 0.1), padding=10, spacing=10)
-        button_container.add_widget(self.button)
-        layout.add_widget(button_container)
-
-        self.result_label = Label(
-            text="",
-            font_size="14sp",
-            size_hint=(1, 0.1),
-            halign="center",
-            valign="middle",
-            text_size=(Window.width * 0.9, None),
-            color=get_color_from_hex("#ffffff"),
-        )
-        layout.add_widget(self.result_label)
+        layout.add_widget(history_button)
+        layout.add_widget(recognize_button)
 
         self.add_widget(layout)
 
-        self.model = YOLO("best.pt")
+    def go_to_camera(self, instance):
+        self.manager.current = "camera"
 
-    def update_camera_frame(self, *args):
-        self.camera_frame.size = self.camera.size
-        self.camera_frame.pos = self.camera.pos
+
+class CameraScreen(Screen):  # Второй экран, камера + сделать фото
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        layout = BoxLayout(orientation="vertical")
+
+        self.camera = Camera(play=True)
+        layout.add_widget(self.camera)
+
+        button_container = BoxLayout(size_hint=(1, 0.1), padding=10)
+        self.capture_button = RoundedButton(text="Сфотографировать")
+        self.capture_button.bind(on_press=self.take_photo)
+        button_container.add_widget(self.capture_button)
+
+        layout.add_widget(button_container)
+        self.add_widget(layout)
+
+        self.model = YOLO("best.pt")
 
     def take_photo(self, instance):
         if not os.path.exists("photos"):
@@ -95,31 +90,66 @@ class MainScreen(Screen):
 
         results = self.model.predict(source=filename, save=False, save_txt=False)
 
-        for result in results:
-            result.save_txt("output.txt")
-
         processed_filename = os.path.join(
             "processed_photos",
             f"processed_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png",
         )
+        with open("output.txt", "w") as file:
+            file.write("")
+        for result in results:
+            result.save_txt("output.txt")
 
         result = results[0]
         annotated_frame = result.plot()
         cv2.imwrite(processed_filename, annotated_frame)
-        with open("output.txt", "r") as file:
-            file = file.readline()
-            self.result_label.text = str(file.strip())
-            with open("output.txt", "w") as file:
-                file.write("")
+
+        self.manager.current = "results"
+
+
+class ResultsScreen(
+    Screen
+):  # Чисто наброски, кнопка вернуться к фотографированию и вывод информации от нейронки
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        layout = BoxLayout(orientation="vertical", padding=20, spacing=20)
+
+        self.result_label = Label(
+            text="",
+            font_size="16sp",
+            size_hint=(1, 0.8),
+            halign="center",
+            valign="middle",
+            color=get_color_from_hex("#ffffff"),
+        )
+        layout.add_widget(self.result_label)
+
+        back_button = RoundedButton(text="Сфотографировать еще раз")
+        back_button.bind(on_press=self.go_back_to_camera)
+        layout.add_widget(back_button)
+
+        self.add_widget(layout)
+
+    def on_pre_enter(self, *args):
+        try:
+            with open("output.txt", "r") as file:
+                self.result_label.text = file.read().strip()
+        except FileNotFoundError:
+            self.result_label.text = "Результаты не найдены."
+
+    def go_back_to_camera(self, instance):
+        self.manager.current = "camera"
 
 
 class MyApp(App):
     def build(self):
         self.sm = ScreenManager()
-        self.main_screen = MainScreen(name="main")
 
-        self.sm.add_widget(self.main_screen)
-        self.sm.current = "main"
+        self.sm.add_widget(MainMenuScreen(name="menu"))
+        self.sm.add_widget(CameraScreen(name="camera"))
+        self.sm.add_widget(ResultsScreen(name="results"))
+
+        self.sm.current = "menu"
 
         return self.sm
 

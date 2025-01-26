@@ -1,0 +1,5 @@
+0.08 rhytisma_acerinum
+0.06 leccinum_scabrum
+0.06 xanthoria_parietina
+0.04 suillus_granulatus
+0.03 nectria_cinnabarina
