@@ -75,7 +75,7 @@ class CameraScreen(Screen):  # Второй экран, камера + сдел�
         layout.add_widget(button_container)
         self.add_widget(layout)
 
-        self.model = YOLO("best.pt")
+        self.model = YOLO("/Users/petrlutkin/Desktop/MushroomDetection/result/train2/weights/best.pt")
 
     def take_photo(self, instance):
         if not os.path.exists("photos"):

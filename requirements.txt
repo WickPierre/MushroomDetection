@@ -1,0 +1,6 @@
+Kivy==2.3.1
+camera4kivy==0.3.3
+ultralytics==8.3.67
+numpy==1.26.4
+tensorflow==2.18.0
+pillow==11.1.0

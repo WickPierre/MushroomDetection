@@ -1,0 +1,118 @@
+description: Ultralytics YOLO11n-cls model trained on /Users/petrlutkin/Desktop/MushroomDetection/dataset_new/
+author: Ultralytics
+date: '2025-01-25T12:42:52.890154'
+version: 8.3.67
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 1
+task: classify
+batch: 1
+imgsz:
+- 512
+- 512
+names:
+  0: amanita_citrina
+  1: amanita_muscaria
+  2: amanita_pantherina
+  3: amanita_rubescens
+  4: apioperdon_pyriforme
+  5: armillaria_borealis
+  6: artomyces_pyxidatus
+  7: bjerkandera_adusta
+  8: boletus_edulis
+  9: boletus_reticulatus
+  10: calocera_viscosa
+  11: calycina_citrina
+  12: cantharellus_cibarius
+  13: cerioporus_squamosus
+  14: cetraria_islandica
+  15: chlorociboria_aeruginascens
+  16: chondrostereum_purpureum
+  17: cladonia_fimbriata
+  18: cladonia_rangiferina
+  19: cladonia_stellaris
+  20: clitocybe_nebularis
+  21: coltricia_perennis
+  22: coprinellus_disseminatus
+  23: coprinellus_micaceus
+  24: coprinopsis_atramentaria
+  25: coprinus_comatus
+  26: crucibulum_laeve
+  27: daedaleopsis_confragosa
+  28: daedaleopsis_tricolor
+  29: evernia_mesomorpha
+  30: evernia_prunastri
+  31: flammulina_velutipes
+  32: fomes_fomentarius
+  33: fomitopsis_betulina
+  34: fomitopsis_pinicola
+  35: ganoderma_applanatum
+  36: graphis_scripta
+  37: gyromitra_esculenta
+  38: gyromitra_gigas
+  39: gyromitra_infula
+  40: hericium_coralloides
+  41: hygrophoropsis_aurantiaca
+  42: hypholoma_fasciculare
+  43: hypholoma_lateritium
+  44: hypogymnia_physodes
+  45: imleria_badia
+  46: inonotus_obliquus
+  47: kuehneromyces_mutabilis
+  48: lactarius_deliciosus
+  49: lactarius_torminosus
+  50: lactarius_turpis
+  51: laetiporus_sulphureus
+  52: leccinum_albostipitatum
+  53: leccinum_aurantiacum
+  54: leccinum_scabrum
+  55: leccinum_versipelle
+  56: lepista_nuda
+  57: lobaria_pulmonaria
+  58: lycoperdon_perlatum
+  59: macrolepiota_procera
+  60: merulius_tremellosus
+  61: mutinus_ravenelii
+  62: nectria_cinnabarina
+  63: panellus_stipticus
+  64: parmelia_sulcata
+  65: paxillus_involutus
+  66: peltigera_aphthosa
+  67: peltigera_praetextata
+  68: phaeophyscia_orbicularis
+  69: phallus_impudicus
+  70: phellinus_igniarius
+  71: phellinus_tremulae
+  72: phlebia_radiata
+  73: pholiota_aurivella
+  74: pholiota_squarrosa
+  75: physcia_adscendens
+  76: platismatia_glauca
+  77: pleurotus_ostreatus
+  78: pleurotus_pulmonarius
+  79: pseudevernia_furfuracea
+  80: rhytisma_acerinum
+  81: sarcomyxa_serotina
+  82: sarcoscypha_austriaca
+  83: sarcosoma_globosum
+  84: schizophyllum_commune
+  85: stereum_hirsutum
+  86: stropharia_aeruginosa
+  87: suillus_granulatus
+  88: suillus_grevillei
+  89: suillus_luteus
+  90: trametes_hirsuta
+  91: trametes_ochracea
+  92: trametes_versicolor
+  93: tremella_mesenterica
+  94: trichaptum_biforme
+  95: tricholomopsis_rutilans
+  96: urnula_craterium
+  97: verpa_bohemica
+  98: vulpicida_pinastri
+  99: xanthoria_parietina
+args:
+  batch: 1
+  half: false
+  int8: false
+  nms: false
