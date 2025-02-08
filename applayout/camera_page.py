@@ -1,28 +1,153 @@
-from kivy.core.window import Window
+from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty
+from kivy.core.window import Window
+from kivy.properties import ObjectProperty, ColorProperty, StringProperty
+from kivy.clock import Clock
+from kivy.metrics import dp
+from camera4kivy import Preview
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.utils import platform
-from kivy.clock import Clock
-from camera4kivy import Preview
-from kivy.uix.screenmanager import Screen
+from datetime import datetime
+import os
 from applayout.toast import Toast
 
-PS1 = """
-<PhotoScreen1>:
-    photo_preview: photo_layout.ids.preview
-    PhotoLayout1:
-        id:photo_layout
-"""
+Builder.load_string(
+    """
+#:import dp kivy.metrics.dp
+<CameraScreen>:
+    photo_preview: preview
+    FloatLayout:
+        # Чёрный фон всего экрана
+        canvas.before:
+            Color:
+                rgba: 0, 0, 0, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        # Камера без изменений
+        Preview:
+            id: preview
+            size_hint: 1, 1
+            pos_hint: {"x": 0, "y": 0}
+
+        # Кнопка "Назад" – снизу слева, круглая красная с двойной обводкой
+        Button:
+            text: "Назад"
+            size_hint: None, None
+            size: dp(70), dp(70)  # увеличенные размеры
+            pos_hint: {"x": 0.05, "y": 0.05}
+            on_release: root.manager.current = "main_page"
+            background_normal: ""
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                # Красный фон кнопки
+                Color:
+                    rgba: 0, 0, 0, 1
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+            canvas.after:
+                # Первая, чёрная обводка
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    ellipse: (self.x, self.y, self.width, self.height)
+                    width: 3
+                # Внешняя, небольшая серая обводка
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 1
+                Line:
+                    ellipse: (self.x - dp(1), self.y - dp(1), self.width + dp(2), self.height + dp(2))
+                    width: 3
+            color: 1, 1, 1, 1
+            font_size: dp(16)
+
+        # Кнопка "Сделать фото" – снизу по центру, увеличенная, без текста, с двойной обводкой
+        Button:
+            text: ""
+            size_hint: None, None
+            size: dp(90), dp(90)  # увеличенные размеры
+            pos_hint: {"center_x": 0.5, "y": 0.03}
+            on_release: root.capture_photo()
+            background_normal: ""
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                # Белый фон кнопки
+                Color:
+                    rgba: 1, 1, 1, 1
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+            canvas.after:
+                # Первая, чёрная обводка
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    ellipse: (self.x, self.y, self.width, self.height)
+                    width: 5
+                # Внешняя, небольшая серая обводка
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 1
+                Line:
+                    ellipse: (self.x - dp(1), self.y - dp(1), self.width + dp(2), self.height + dp(2))
+                    width: 2
+
+        # Кнопка "Перевернуть камеру" – снизу справа, увеличенная, с изображением, обрезанным по контуру кнопки и двойной обводкой
+        Button:
+            size_hint: None, None
+            size: dp(70), dp(70)  # увеличенные размеры
+            pos_hint: {"right": 0.95, "y": 0.05}
+            on_release: root.select_camera("toggle")
+            background_normal: ""
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                # Черный круг – фон кнопки
+                Color:
+                    rgba: 0, 0, 0, 1
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+            canvas:
+                # Используем stencil для обрезки изображения по форме круга
+                StencilPush
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+                StencilUse
+                Rectangle:
+                    source:  'icons/camera_flip.png'
+                    # Уменьшаем размер изображения на 10 единиц, отступ по 5 единиц с каждой стороны:
+                    pos: (self.x + dp(5), self.y + dp(5))
+                    size: (self.width - dp(10), self.height - dp(10))
+                StencilUnUse
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+                StencilPop
+            canvas.after:
+                # Первая, чёрная обводка
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    ellipse: (self.x, self.y, self.width, self.height)
+                    width: 3
+                # Внешняя, небольшая серая обводка
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 1
+                Line:
+                    ellipse: (self.x - dp(1), self.y - dp(1), self.width + dp(2), self.height + dp(2))
+                    width: 3
+    """
+)
 
 
-class PhotoScreen1(Screen):
+class CameraScreen(Screen):
     photo_preview = ObjectProperty(None)
 
-    def __init__(self, **args):
-        Builder.load_string(PS1)
-        super().__init__(**args)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def on_enter(self):
         self.photo_preview.connect_camera(filepath_callback=self.open_pred)
@@ -30,122 +155,11 @@ class PhotoScreen1(Screen):
     def on_pre_leave(self):
         self.photo_preview.disconnect_camera()
 
-    # def capture_path(self, file_path):
-    #     Toast().show(file_path)
-    #     self.open_pred()
+    def select_camera(self, facing):
+        self.photo_preview.select_camera(facing)
+
+    def capture_photo(self):
+        self.photo_preview.capture_photo(location=".", subdir="photos", name="1")
 
     def open_pred(self, file_path):
-        Clock.schedule_once(lambda dt: setattr(self.manager, "current", "predict_mushroom"), 0)
-        # Clock.schedule_once(lambda dt: self.manager.current = 'predict_mushroom')
-
-
-PL1 = """
-<PhotoLayout1>:
-    Background1:
-        id: pad_end
-    Preview:
-        id: preview
-        letterbox_color: .8, .3, 1, .5
-    ButtonsLayout1:
-        id: buttons
-
-<Background1@Label>:
-    canvas:
-        Color: 
-            rgba: .8, .3, 1, .5
-        Rectangle:
-            pos: self.pos
-            size: self.size
-"""
-
-
-class PhotoLayout1(BoxLayout):
-
-    def __init__(self, **args):
-        Builder.load_string(PL1)
-        super().__init__(**args)
-
-    def on_size(self, layout, size):
-        if Window.width < Window.height:
-            self.orientation = 'vertical'
-            self.ids.preview.size_hint = (1, .8)
-            self.ids.buttons.size_hint = (1, .2)
-            self.ids.pad_end.size_hint = (1, .1)
-        else:
-            self.orientation = 'horizontal'
-            self.ids.preview.size_hint = (.8, 1)
-            self.ids.buttons.size_hint = (.2, 1)
-            self.ids.pad_end.size_hint = (.1, 1)
-
-
-BL1 = """
-<ButtonsLayout1>:
-    Background1:
-    Button:
-        id:other
-        on_press: root.select_camera('toggle')
-        height: self.width
-        width: self.height
-        background_normal: 'icons/camera-flip-outline.png'
-        background_down:   'icons/camera-flip-outline.png'
-    Button:
-        id:flash
-        on_press: root.flash()
-        height: self.width
-        width: self.height
-        background_normal: 'icons/flash-off.png'
-        background_down:   'icons/flash-off.png'
-    Button:
-        id:photo
-        on_press: root.photo()
-        height: self.width
-        width: self.height
-        background_normal: 'icons/camera_white.png'
-        background_down:   'icons/camera_red.png'
-"""
-
-
-class ButtonsLayout1(RelativeLayout):
-
-    def __init__(self, **args):
-        Builder.load_string(BL1)
-        super().__init__(**args)
-
-    def on_size(self, layout, size):
-        if platform in ['android', 'ios']:
-            self.ids.photo.min_state_time = 0.3
-        else:
-            self.ids.photo.min_state_time = 1
-        if Window.width < Window.height:
-            self.ids.other.pos_hint = {'center_x': .2, 'center_y': .5}
-            self.ids.other.size_hint = (.2, None)
-            self.ids.photo.pos_hint = {'center_x': .5, 'center_y': .5}
-            self.ids.photo.size_hint = (.24, None)
-            self.ids.flash.pos_hint = {'center_x': .8, 'center_y': .5}
-            self.ids.flash.size_hint = (.15, None)
-        else:
-            self.ids.other.pos_hint = {'center_x': .5, 'center_y': .8}
-            self.ids.other.size_hint = (None, .2)
-            self.ids.photo.pos_hint = {'center_x': .5, 'center_y': .5}
-            self.ids.photo.size_hint = (None, .24)
-            self.ids.flash.pos_hint = {'center_x': .5, 'center_y': .2}
-            self.ids.flash.size_hint = (None, .15)
-
-    def photo(self):
-        self.parent.ids.preview.capture_photo(location='.', subdir='photos', name='1')
-        # self.parent.parent.open_pred()
-
-    def flash(self):
-        icon = self.parent.ids.preview.flash()
-        if icon == 'on':
-            self.ids.flash.background_normal = 'icons/flash.png'
-            self.ids.flash.background_down = 'icons/flash.png'
-        elif icon == 'auto':
-            self.ids.flash.background_normal = 'icons/flash-auto.png'
-            self.ids.flash.background_down = 'icons/flash-auto.png'
-        else:
-            self.ids.flash.background_normal = 'icons/flash-off.png'
-            self.ids.flash.background_down = 'icons/flash-off.png'
-
-    def select_camera(self, facing):
-        self.parent.ids.preview.select_camera(facing)
+        Clock.schedule_once(lambda dt: setattr(self.manager, "current", "analysis"), 0)
