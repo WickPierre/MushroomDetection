@@ -7,8 +7,11 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.behaviors import ButtonBehavior
-from database import get_saved_mushrooms
+from database import Database
 from applayout.theme_manager import theme_manager
+
+
+db = Database()
 
 
 Builder.load_string(
@@ -171,7 +174,7 @@ class HistoryScreen(Screen):
     def update_history(self):
         history_list = self.ids.history_list
         history_list.clear_widgets()
-        mushrooms = get_saved_mushrooms()
+        mushrooms = db.get_saved_mushrooms()
         for mushroom in mushrooms:
             history_list.add_widget(HistoryCard(mushroom=mushroom))
 

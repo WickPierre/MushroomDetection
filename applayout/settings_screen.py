@@ -2,7 +2,9 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivy.metrics import dp
 from applayout.models import RoundedButton
-from database import clear_history  # Импортируем функцию очистки истории
+from database import Database  # Импортируем функцию очистки истории
+
+db = Database()
 
 Builder.load_string(
     """
@@ -42,5 +44,5 @@ Builder.load_string(
 class SettingsScreen(Screen):
     def clear_history(self):
         # Очищает историю сканирований в базе данных.
-        clear_history()
+        db.clear_history()
         print("История сканирований очищена")

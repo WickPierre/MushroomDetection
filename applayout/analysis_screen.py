@@ -11,8 +11,10 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.label import Label
 from applayout.models import RoundedButton
 from PIL import Image as PILImage
-from database import save_mushroom  # Импортируем функцию сохранения
+from database import Database  # Импортируем функцию сохранения
 
+
+db = Database()
 
 if platform == "android":
     from android.storage import primary_external_storage_path
@@ -165,7 +167,7 @@ class PredictMushroom(Screen):
         mushroom_name = f"Гриб {class_label}"
 
         mushroom_description = f"Гриб распознан с индексом {predicted_class}"
-        save_mushroom(mushroom_name, self.image_path, mushroom_description)
+        db.save_mushroom(mushroom_name, self.image_path, mushroom_description)
         # Обновляем результат на экране
         Clock.schedule_once(
             lambda dt: self.update_result(f"Результат: {class_label}")

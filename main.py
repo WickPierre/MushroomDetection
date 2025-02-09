@@ -9,15 +9,12 @@ from applayout.analysis_screen import PredictMushroom
 from applayout.history_screen import HistoryScreen
 from applayout.settings_screen import SettingsScreen
 from applayout.theme_manager import theme_manager
-from kivy.config import Config
 import os
 
 if platform == "android":
     from jnius import autoclass
     from android.runnable import run_on_ui_thread
     from android import mActivity
-
-    # Config.set("kivy", "window_icon", os.path.join("icons", "logo.png"))
 
     View = autoclass("android.view.View")
 
