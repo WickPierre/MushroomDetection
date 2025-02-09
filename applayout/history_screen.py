@@ -7,11 +7,8 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.behaviors import ButtonBehavior
-from database import Database
 from applayout.theme_manager import theme_manager
-
-
-db = Database()
+import database as db
 
 
 Builder.load_string(

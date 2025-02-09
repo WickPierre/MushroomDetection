@@ -9,6 +9,7 @@ from applayout.analysis_screen import PredictMushroom
 from applayout.history_screen import HistoryScreen
 from applayout.settings_screen import SettingsScreen
 from applayout.theme_manager import theme_manager
+import database as db
 import os
 
 if platform == "android":
@@ -35,6 +36,7 @@ elif platform != "ios":
 class MyApp(App):
 
     theme = theme_manager
+    db.init_db()
 
     def build(self):
         self.sm = ScreenManager()

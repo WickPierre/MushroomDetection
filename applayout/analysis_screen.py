@@ -11,10 +11,8 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.label import Label
 from applayout.models import RoundedButton
 from PIL import Image as PILImage
-from database import Database  # Импортируем функцию сохранения
+import database as db
 
-
-db = Database()
 
 if platform == "android":
     from android.storage import primary_external_storage_path
@@ -146,10 +144,11 @@ class PredictMushroom(Screen):
         self.add_widget(self.layout)
 
     def on_enter(self):
+        self.btn_recognize.disabled = False
         self.update_image()
 
     def on_pre_leave(self):
-        # delete_image(self.image_path)
+        delete_image(self.image_path)
         self.image.clear_widgets()
         self.image.reload()
 
@@ -168,11 +167,8 @@ class PredictMushroom(Screen):
         y = self.model.pred(img_array)  # Предсказываем изображение
 
         predicted_class = np.argmax(y)  # Определяем индекс самого релевантного класса
-        try:
-            class_label = self.labels[predicted_class]
-        except IndexError:
-            print("ERROR")
-            print(self.labels)
+
+        class_label = self.labels[predicted_class]
         mushroom_name = f"Гриб {class_label}"
 
         mushroom_description = f"Гриб распознан с индексом {predicted_class}"

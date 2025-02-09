@@ -4,6 +4,4 @@ dataset
 dataset_new
 .idea
 photos
-processed_photos
-buildozer.spec
-result
+model.tflite

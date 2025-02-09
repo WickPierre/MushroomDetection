@@ -2,9 +2,8 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivy.metrics import dp
 from applayout.models import RoundedButton
-from database import Database  # Импортируем функцию очистки истории
+import database as db  # Импортируем функцию очистки истории
 
-db = Database()
 
 Builder.load_string(
     """
