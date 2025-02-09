@@ -62,12 +62,12 @@ class TensorFlowModel:
         return np.reshape(np.array(output.getFloatArray()), self.output_shape)
 
 
-# def delete_image(image_path):
-#     if os.path.exists(image_path):  # Проверяем, существует ли файл
-#         os.remove(image_path)  # Удаляем файл
-#         print(f"Файл {image_path} успешно удален.")
-#     else:
-#         print(f"Файл {image_path} не существует.")
+def delete_image(image_path):
+    if os.path.exists(image_path):  # Проверяем, существует ли файл
+        os.remove(image_path)  # Удаляем файл
+        print(f"Файл {image_path} успешно удален.")
+    else:
+        print(f"Файл {image_path} не существует.")
 
 
 # Загрузка меток классов
@@ -104,34 +104,43 @@ class PredictMushroom(Screen):
             self.model = None
             self.image_path = "photos/1.jpg"
 
+        # Основной вертикальный layout
         self.layout = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(10))
         with self.layout.canvas.before:
             Color(1, 1, 1, 1)
             self.bg_rect = Rectangle(pos=self.layout.pos, size=self.layout.size)
         self.layout.bind(pos=self.update_rect, size=self.update_rect)
 
-        self.image = Image()
+        # Увеличиваем область для фотографии (около 80% экрана)
+        self.image = Image(size_hint=(1, 0.8), allow_stretch=True, keep_ratio=True)
         self.layout.add_widget(self.image)
 
+        # Результирующая метка – чуть меньше по высоте (примерно 10% экрана)
         self.result_label = Label(
             text="Результат: Ожидание",
-            size_hint=(1, 0.3),
+            size_hint=(1, 0.1),
             halign="center",
             valign="middle",
             color=(0, 0, 0, 1),
         )
         self.layout.add_widget(self.result_label)
 
-        # Кнопка "Распознать"
-        self.btn_recognize = RoundedButton(text="Распознать", size_hint=(1, 1))
+        # Горизонтальный layout для кнопок (оставшиеся 10% экрана)
+        button_box = BoxLayout(
+            orientation="horizontal", size_hint=(1, 0.1), spacing=dp(10)
+        )
+
+        # Кнопка "Распознать" – размер уменьшен, занимает половину горизонтального пространства
+        self.btn_recognize = RoundedButton(text="Распознать", size_hint=(0.5, 1))
         self.btn_recognize.bind(on_press=self.start_classification)
-        self.layout.add_widget(self.btn_recognize)
+        button_box.add_widget(self.btn_recognize)
 
-        # Кнопка "Назад"
-        btn_back = RoundedButton(text="Назад", size_hint=(1, 1))
+        # Кнопка "Назад" – аналогично, занимает вторую половину
+        btn_back = RoundedButton(text="Назад", size_hint=(0.5, 1))
         btn_back.bind(on_press=self.go_back)
-        self.layout.add_widget(btn_back)
+        button_box.add_widget(btn_back)
 
+        self.layout.add_widget(button_box)
         self.add_widget(self.layout)
 
     def on_enter(self):
@@ -154,9 +163,9 @@ class PredictMushroom(Screen):
         input_shape = self.model.get_input_shape()
         img_array = preprocess_image(self.image_path, input_shape)
 
-        y = self.model.pred(img_array) # Предсказываем изображение
+        y = self.model.pred(img_array)  # Предсказываем изображение
 
-        predicted_class = np.argmax(y) # Определяем индекс самого релевантного класса
+        predicted_class = np.argmax(y)  # Определяем индекс самого релевантного класса
         try:
             class_label = self.labels[predicted_class]
         except IndexError:
@@ -167,9 +176,7 @@ class PredictMushroom(Screen):
         mushroom_description = f"Гриб распознан с индексом {predicted_class}"
         save_mushroom(mushroom_name, self.image_path, mushroom_description)
         # Обновляем результат на экране
-        Clock.schedule_once(
-            lambda dt: self.update_result(f"Результат: {class_label}")
-        )
+        Clock.schedule_once(lambda dt: self.update_result(f"Результат: {class_label}"))
 
     def update_result(self, text):
         self.result_label.text = text
