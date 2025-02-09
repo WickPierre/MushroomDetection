@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import os
 
 
 class Database:
@@ -19,13 +20,43 @@ class Database:
         )
         self.conn.commit()
 
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS mushroom (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                image_path TEXT NOT NULL,
+                description TEXT NOT NULL
+            )
+            """
+        )
+        self.conn.commit()
+
+        if not os.path.exists("mushroom_names.txt"):
+            return
+
+        with open("mushroom_names.txt", "r", encoding="utf-8") as f:
+            mushrooms = [line.strip() for line in f.readlines() if line.strip()]
+
+        for mushroom in mushrooms:
+            self.cursor.execute(
+                "INSERT OR IGNORE INTO mushroom (name, image_path, description) VALUES (?, ?, ?)",
+                (mushroom, "1.jpg", "just test"),
+            )
+        self.conn.commit()
+
     def save_mushroom(self, name, image_path, description=""):
         self.cursor.execute(
             """
             INSERT INTO mushroom_history (name, image_path, scan_date, description)
             VALUES (?, ?, ?, ?)
             """,
-            (name, image_path, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), description),
+            (
+                name,
+                image_path,
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                description,
+            ),
         )
         self.conn.commit()
 

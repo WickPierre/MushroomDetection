@@ -9,23 +9,39 @@ from kivy.utils import get_color_from_hex
 class RoundedButton(ButtonBehavior, Label):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.padding = kwargs.get("padding", [20, 10])
-        self.font_size = kwargs.get("font_size", "24sp")
-        self.size_hint = kwargs.get("size_hint", (None, None))
-        self.size = kwargs.get("size", (240, 100))
-        self.halign = kwargs.get("halign", "center")
-        self.valign = kwargs.get("valign", "middle")
-        self.color = kwargs.get("color", get_color_from_hex("#ffffff"))
-        bg_color = kwargs.get("background_color", get_color_from_hex("#008000"))
-        radius = kwargs.get("radius", [30])
+        self.padding = [20, 10]
+        self.font_size = "18sp"
+        self.size_hint = (None, None)
+        self.size = (220, 56)
+        self.halign = "center"
+        self.valign = "middle"
+        self.font_name = "srift.ttf"
+        self.color = get_color_from_hex("#FFFFFF")
+        self.bold = True
+
+        self.bg_color = get_color_from_hex("#002137")
+        self.radius = [30]
+
         with self.canvas.before:
-            Color(*bg_color)
-            self.rect = RoundedRectangle(radius=radius, size=self.size, pos=self.pos)
+            Color(*self.bg_color)
+            self.rect = RoundedRectangle(
+                radius=self.radius, size=self.size, pos=self.pos
+            )
+
+            Color(0, 0, 0, 0.3)
+            self.shadow = RoundedRectangle(
+                radius=self.radius,
+                size=(self.size[0] + 2, self.size[1] + 2),
+                pos=(self.pos[0] - 1, self.pos[1] - 1),
+            )
+
         self.bind(pos=self.update_rect, size=self.update_rect)
 
     def update_rect(self, *args):
         self.rect.size = self.size
         self.rect.pos = self.pos
+        self.shadow.size = (self.size[0] + 2, self.size[1] + 2)
+        self.shadow.pos = (self.pos[0] - 1, self.pos[1] - 1)
 
 
 class MushroomCard(BoxLayout):

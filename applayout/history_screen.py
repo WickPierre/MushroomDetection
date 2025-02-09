@@ -24,7 +24,7 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: app.theme.get("background_color")
+                rgba: (0.26, 0.27, 0.33, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -62,7 +62,7 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: app.theme.get("background_color")
+                rgba: (0.26, 0.27, 0.33, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size

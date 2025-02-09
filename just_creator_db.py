@@ -20,9 +20,7 @@ mushroom_data = [
     ("Russula emetica", "photos/1.jpg", "2025-02-09"),
 ]
 
-cursor.executemany(
-    "INSERT INTO mushrooms (name, image_path, date) VALUES (?, ?, ?);", mushroom_data
-)
+
 mushroom_history_data = [
     (
         "Agaricus bisporus",
@@ -86,7 +84,6 @@ mushroom_history_data = [
         "Ядовитый гриб, вызывает рвоту и отравление.",
     ),
 ]
-
 cursor.executemany(
     "INSERT INTO mushroom_history (name, image_path, scan_date, description) VALUES (?, ?, ?, ?);",
     mushroom_history_data,
