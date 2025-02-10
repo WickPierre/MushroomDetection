@@ -65,20 +65,19 @@ class MushroomCard(BoxLayout):
             Label(text=name, font_size="16sp", halign="left", bold=True)
         )
         text_box.add_widget(
-            Label(text=date, font_size="12sp", color=get_color_from_hex("#666666"))
+            Label(text=date, font_size="12sp", color=get_color_from_hex("#002137"))
         )
         self.add_widget(text_box)
 
-        # Кнопка удаления заменена на RoundedButton с нужными параметрами:
         btn_delete = RoundedButton(
             text="×",
             font_size="24sp",
             size_hint=(None, None),
             size=(50, 50),
-            color=get_color_from_hex("#ff0000"),
+            color=get_color_from_hex("#FFFFFF"),
             padding=[0, 0],
-            background_color=get_color_from_hex("#444444"),
-            radius=[25],  # Радиус выбран так, чтобы кнопка выглядела округло
+            background_color=get_color_from_hex("#002137"),
+            radius=[25],
         )
         btn_delete.bind(on_release=lambda x: self.delete_card())
         self.add_widget(btn_delete)

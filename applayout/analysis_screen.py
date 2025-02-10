@@ -129,7 +129,7 @@ class PredictMushroom(Screen):
 
         # Горизонтальный layout для кнопок (оставшиеся 10% экрана)
         button_box = BoxLayout(
-            orientation="horizontal", size_hint=(1, 0.15), spacing=dp(10)
+            orientation="horizontal", size_hint=(1, 0.2), spacing=dp(15)
         )
 
         # Кнопка "Назад" – аналогично, занимает вторую половину
