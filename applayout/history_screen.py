@@ -45,13 +45,13 @@ Builder.load_string(
                 height: self.minimum_height
                 spacing: dp(10)
 
-        Button:
+        RoundedButton:
             text: "Назад"
-            size_hint_y: None
-            height: root.height * 0.1
+            size_hint: (0.95, 0.15)
+            pos_hint: {'center_x': 0.5}
             on_release: root.manager.current = "main_page"
-            background_color: (0.26, 0.27, 0.33, 1)
-            color: 1, 1, 1, 1
+
+            
 
 <MushroomDetailScreen>:
     name: "mushroom_detail"
@@ -97,13 +97,11 @@ Builder.load_string(
                 background_color: (0.26, 0.27, 0.33, 1)
                 color: (1, 1, 1, 1)
 
-        Button:
+        RoundedButton:
             text: "Назад"
-            size_hint_y: None
-            height: dp(40)
+            size_hint: (0.95, 0.15)
+            pos_hint: {'center_x': 0.5}
             on_release: root.manager.current = "history"
-            background_color: (0.26, 0.27, 0.33, 1)
-            color: (1, 1, 1, 1)
 """
 )
 

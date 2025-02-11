@@ -12,7 +12,7 @@ from kivy.uix.label import Label
 from applayout.models import RoundedButton
 from PIL import Image as PILImage
 import database as db
-
+from kivy.lang import Builder
 
 if platform == "android":
     from android.storage import primary_external_storage_path
@@ -29,6 +29,48 @@ else:
     import tensorflow as tf
 
     Interpreter = tf.lite.Interpreter
+
+Builder.load_string(
+    """
+<PredictMushroom>:
+    name: "predict_mushroom"
+    BoxLayout:
+        orientation: "vertical"
+        padding: dp(10)
+        spacing: dp(10)
+        canvas.before:
+            Color:
+                rgba: (0.26, 0.27, 0.33, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Image:
+            id: image_display
+            size_hint: (1, 0.8)
+            allow_stretch: True
+            keep_ratio: True
+
+        Label:
+            id: result_label
+            text: "Classifying image..."
+            size_hint: (1, 0.1)
+            halign: "center"
+            valign: "middle"
+            color: (1, 1, 1, 1)
+
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: (1, 0.2)
+            spacing: dp(5)
+            
+            RoundedButton:
+                text: "Назад"
+                size_hint: (0.9, 0.05)
+                pos_hint: {"center_x": 0.5}
+                on_release: root.go_back()
+    """
+)
 
 
 class TensorFlowModel:
@@ -104,50 +146,15 @@ class PredictMushroom(Screen):
             self.model = None
             self.image_for_classification_path = "photos/1.jpg"
 
-        # Основной вертикальный layout
-        self.layout = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(10))
-        with self.layout.canvas.before:
-            Color(0.26, 0.27, 0.33, 1)
-            self.bg_rect = Rectangle(pos=self.layout.pos, size=self.layout.size)
-        self.layout.bind(pos=self.update_rect, size=self.update_rect)
-
-        # Увеличиваем область для фотографии (около 80% экрана)
-        self.image = Image(size_hint=(1, 0.8), allow_stretch=True, keep_ratio=True)
-        self.layout.add_widget(self.image)
-
-        # Результирующая метка – чуть меньше по высоте (примерно 10% экрана)
-        self.result_label = Label(
-            text="Classifying image...",
-            size_hint=(1, 0.1),
-            halign="center",
-            valign="middle",
-            color=(1, 1, 1, 1),
-        )
-        self.layout.add_widget(self.result_label)
-
-        # Горизонтальный layout для кнопок (оставшиеся 10% экрана)
-        button_box = BoxLayout(
-            orientation="vertical", size_hint=(1, 0.2), spacing=dp(5)
-        )
-
-        # Кнопка "Назад" – центрирована
-        btn_back = RoundedButton(
-            text="Назад",
-            size_hint=(None, None),
-            pos_hint={"center_x": 0.5},
-        )
-        btn_back.bind(on_press=self.go_back)
-        button_box.add_widget(btn_back)
-
-        self.layout.add_widget(button_box)
-        self.add_widget(self.layout)
-
     def on_enter(self):
         self.start_classification()
 
     def on_pre_leave(self):
         delete_image(self.image_for_classification_path)
-        self.image.clear_widgets()
+        self.ids.image_display.source = (
+            ""  # Для того, чтобы кнопка заработала, пришлось сделать так
+        )
+        # self.image.clear_widgets()
         # self.image.reload()
 
     def update_rect(self, *args):
@@ -163,16 +170,22 @@ class PredictMushroom(Screen):
 
         y = self.model.pred(img_array)  # Предсказываем изображение
 
-        predicted_index_of_class = np.argmax(y)  # Определяем индекс самого релевантного класса
+        predicted_index_of_class = np.argmax(
+            y
+        )  # Определяем индекс самого релевантного класса
 
         predicted_class = self.labels[predicted_index_of_class]
         mushroom_name = f"Гриб {predicted_class}"
 
         mushroom_description = f"Гриб распознан с индексом {predicted_index_of_class}"
-        self.image_path = os.path.join(os.getcwd(), f"mushroom_picture/{predicted_class}.jpg")  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
+        self.image_path = os.path.join(
+            os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
+        )  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
         db.save_mushroom(mushroom_name, self.image_path, mushroom_description)
         # Обновляем результат на экране
-        Clock.schedule_once(lambda dt: self.update_result(f"Результат: {predicted_class}"))
+        Clock.schedule_once(
+            lambda dt: self.update_result(f"Результат: {predicted_class}")
+        )
 
     def update_result(self, text):
         self.result_label.text = text
@@ -182,6 +195,5 @@ class PredictMushroom(Screen):
         self.image.source = self.image_path
         self.image.reload()
 
-
-    def go_back(self, instance):
+    def go_back(self, instance=None):
         self.manager.current = "main_page"
