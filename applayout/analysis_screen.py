@@ -107,7 +107,7 @@ class PredictMushroom(Screen):
         # Основной вертикальный layout
         self.layout = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(10))
         with self.layout.canvas.before:
-            Color(1, 1, 1, 1)
+            Color(0.26, 0.27, 0.33, 1)
             self.bg_rect = Rectangle(pos=self.layout.pos, size=self.layout.size)
         self.layout.bind(pos=self.update_rect, size=self.update_rect)
 
@@ -121,22 +121,21 @@ class PredictMushroom(Screen):
             size_hint=(1, 0.1),
             halign="center",
             valign="middle",
-            color=(0, 0, 0, 1),
+            color=(1, 1, 1, 1),
         )
         self.layout.add_widget(self.result_label)
 
         # Горизонтальный layout для кнопок (оставшиеся 10% экрана)
         button_box = BoxLayout(
-            orientation="horizontal", size_hint=(1, 0.1), spacing=dp(10)
+            orientation="vertical", size_hint=(1, 0.2), spacing=dp(5)
         )
 
-        # Кнопка "Распознать" – размер уменьшен, занимает половину горизонтального пространства
-        self.btn_recognize = RoundedButton(text="Распознать", size_hint=(0.5, 1))
-        self.btn_recognize.bind(on_press=self.start_classification)
-        button_box.add_widget(self.btn_recognize)
-
-        # Кнопка "Назад" – аналогично, занимает вторую половину
-        btn_back = RoundedButton(text="Назад", size_hint=(0.5, 1))
+        # Кнопка "Назад" – центрирована
+        btn_back = RoundedButton(
+            text="Назад",
+            size_hint=(None, None),
+            pos_hint={"center_x": 0.5},
+        )
         btn_back.bind(on_press=self.go_back)
         button_box.add_widget(btn_back)
 
@@ -146,6 +145,7 @@ class PredictMushroom(Screen):
     def on_enter(self):
         self.btn_recognize.disabled = False
         self.update_image()
+        self.start_classification(None)
 
     def on_pre_leave(self):
         delete_image(self.image_path)
@@ -172,6 +172,7 @@ class PredictMushroom(Screen):
         mushroom_name = f"Гриб {class_label}"
 
         mushroom_description = f"Гриб распознан с индексом {predicted_class}"
+        self.image_path = f"mushroom_picture/{predicted_class + 1}.jpg"  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
         db.save_mushroom(mushroom_name, self.image_path, mushroom_description)
         # Обновляем результат на экране
         Clock.schedule_once(lambda dt: self.update_result(f"Результат: {class_label}"))

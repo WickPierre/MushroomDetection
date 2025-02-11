@@ -7,8 +7,12 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.behaviors import ButtonBehavior
+from database import Database
 from applayout.theme_manager import theme_manager
-import database as db
+from kivy.utils import get_color_from_hex
+
+
+db = Database()
 
 
 Builder.load_string(
@@ -21,7 +25,7 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: app.theme.get("background_color")
+                rgba: (0.26, 0.27, 0.33, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -32,7 +36,7 @@ Builder.load_string(
             height: dp(40)
             font_size: "20sp"
             halign: "center"
-            color: app.theme.get("text_color")
+            color: (1, 1, 1, 1)
 
         ScrollView:
             size_hint_y: 1
@@ -48,7 +52,7 @@ Builder.load_string(
             size_hint_y: None
             height: root.height * 0.1
             on_release: root.manager.current = "main_page"
-            background_color: 0, 0, 0, 1
+            background_color: (0.26, 0.27, 0.33, 1)
             color: 1, 1, 1, 1
 
 <MushroomDetailScreen>:
@@ -59,7 +63,7 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: app.theme.get("background_color")
+                rgba: (0.26, 0.27, 0.33, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -71,7 +75,8 @@ Builder.load_string(
             height: dp(40)
             font_size: "20sp"
             halign: "center"
-            color: app.theme.get("text_color")
+            background_color: (0.26, 0.27, 0.33, 1)
+            color: (1, 1, 1, 1)
 
         Image:
             id: mushroom_image
@@ -91,15 +96,16 @@ Builder.load_string(
                 halign: "left"
                 valign: "top"
                 text_size: self.width, None
-                color: app.theme.get("text_color")
+                background_color: (0.26, 0.27, 0.33, 1)
+                color: (1, 1, 1, 1)
 
         Button:
             text: "Назад"
             size_hint_y: None
             height: dp(40)
             on_release: root.manager.current = "history"
-            background_color: 0, 0, 0, 1
-            color: 1, 1, 1, 1
+            background_color: (0.26, 0.27, 0.33, 1)
+            color: (1, 1, 1, 1)
 """
 )
 
@@ -117,7 +123,7 @@ class HistoryCard(ButtonBehavior, BoxLayout):
         self.spacing = dp(5)
 
         with self.canvas.before:
-            Color(*theme_manager.get("button_color"))
+            Color(get_color_from_hex("#002137"))
             self.rect = RoundedRectangle(size=self.size, pos=self.pos, radius=[10])
         self.bind(size=self.update_rect, pos=self.update_rect)
 
