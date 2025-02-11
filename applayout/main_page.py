@@ -11,6 +11,7 @@ Builder.load_string(
     # не переопределяя логику отрисовки из Python.
     font_size: self.height * 0.15
 
+    
 <MainPage>:
     BoxLayout:
         orientation: 'vertical'

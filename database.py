@@ -38,10 +38,13 @@ class Database:
         with open("mushroom_names.txt", "r", encoding="utf-8") as f:
             mushrooms = [line.strip() for line in f.readlines() if line.strip()]
 
+        counter = 1
+
         for mushroom in mushrooms:
+            counter += 1
             self.cursor.execute(
                 "INSERT OR IGNORE INTO mushroom (name, image_path, description) VALUES (?, ?, ?)",
-                (mushroom, "1.jpg", "just test"),
+                (mushroom, f"{counter}.jpg", "just test"),
             )
         self.conn.commit()
 

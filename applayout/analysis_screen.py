@@ -129,11 +129,15 @@ class PredictMushroom(Screen):
 
         # Горизонтальный layout для кнопок (оставшиеся 10% экрана)
         button_box = BoxLayout(
-            orientation="horizontal", size_hint=(1, 0.2), spacing=dp(15)
+            orientation="vertical", size_hint=(1, 0.2), spacing=dp(5)
         )
 
-        # Кнопка "Назад" – аналогично, занимает вторую половину
-        btn_back = RoundedButton(text="Назад", size_hint=(1, 1))
+        # Кнопка "Назад" – центрирована
+        btn_back = RoundedButton(
+            text="Назад",
+            size_hint=(None, None),
+            pos_hint={"center_x": 0.5},
+        )
         btn_back.bind(on_press=self.go_back)
         button_box.add_widget(btn_back)
 
@@ -172,6 +176,7 @@ class PredictMushroom(Screen):
         mushroom_name = f"Гриб {class_label}"
 
         mushroom_description = f"Гриб распознан с индексом {predicted_class}"
+        self.image_path = f"mushroom_picture/{predicted_class + 1}.jpg"  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
         db.save_mushroom(mushroom_name, self.image_path, mushroom_description)
         # Обновляем результат на экране
         Clock.schedule_once(lambda dt: self.update_result(f"Результат: {class_label}"))
