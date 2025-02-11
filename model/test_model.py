@@ -1,22 +1,3 @@
-# from ultralytics import YOLO
-# from PIL import Image as PILImage
-#
-#
-# # Преобразование изображения в формат, который принимает модель
-# def preprocess_image(image_path, input_shape):
-#     img = PILImage.open('/Users/petrlutkin/Desktop/MushroomDetection/1.jpg').convert("RGB")
-#     img = img.resize((input_shape[1], input_shape[2]))
-#     # img = np.array(img).astype(np.float32)  # / 255.0 Нормализация
-#     # # img = np.expand_dims(img, axis=0)  # Добавляем batch размерность
-#     # return img
-#
-# model = YOLO('/Users/petrlutkin/Desktop/MushroomDetection/result/train2/weights/best.pt')
-# # preprocess_image('1', (1, 512, 512, 3))z
-# model.predict(
-#     '1.jpg',
-#     imgsz=512
-# )
-
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -37,14 +18,14 @@ def load_labels(label_path):
 INPUT_SIZE = (224, 224)
 
 # Список классов (пример для классификации)
-class_names = load_labels("/Users/petrlutkin/Desktop/MushroomDetection/converted_tflite/labels.txt")
+class_names = load_labels("/labels.txt")
 
 
 class ClassifierApp(App):
     def build(self):
         self.title = "Image Classifier"
 
-        self.image_path = "/Users/petrlutkin/Desktop/MushroomDetection/3.jpeg"
+        self.image_path = "/Users/petrlutkin/Downloads/1.jpg"
 
         # Основной макет
         self.layout = BoxLayout(orientation="vertical", spacing=10, padding=10)
@@ -75,7 +56,7 @@ class ClassifierApp(App):
             input_data = self.preprocess_image(self.image_path)
 
             # Инференс модели TFLite
-            interpreter = tf.lite.Interpreter(model_path="/Users/petrlutkin/Desktop/MushroomDetection/model.tflite")
+            interpreter = tf.lite.Interpreter(model_path="/model.tflite")
             interpreter.allocate_tensors()
             input_details = interpreter.get_input_details()
             output_details = interpreter.get_output_details()

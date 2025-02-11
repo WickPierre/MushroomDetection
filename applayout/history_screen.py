@@ -7,16 +7,14 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.behaviors import ButtonBehavior
-from database import Database
 from applayout.theme_manager import theme_manager
 from kivy.utils import get_color_from_hex
-
-
-db = Database()
+import database as db
 
 
 Builder.load_string(
     """
+#:import os os
 <HistoryScreen>:
     name: "history"
     BoxLayout:
@@ -80,7 +78,7 @@ Builder.load_string(
 
         Image:
             id: mushroom_image
-            source: root.mushroom_photo if root.mushroom_photo else "default_image.png"
+            source: os.path.join(os.getcwd(), root.mushroom_photo)
             size_hint_y: 0.5
             allow_stretch: True
             keep_ratio: True

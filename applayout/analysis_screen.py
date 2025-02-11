@@ -11,10 +11,8 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.label import Label
 from applayout.models import RoundedButton
 from PIL import Image as PILImage
-from database import Database  # Импортируем функцию сохранения
+import database as db
 
-
-db = Database()
 
 if platform == "android":
     from android.storage import primary_external_storage_path
@@ -93,18 +91,18 @@ class PredictMushroom(Screen):
         super().__init__(**kwargs)
         self.model_path = os.path.join(os.getcwd(), "model.tflite")
         self.labels_path = os.path.join(os.getcwd(), "labels.txt")
-
         self.labels = load_labels(self.labels_path)
+        self.image_path = None
 
         if platform == "android":
             self.model = TensorFlowModel()
             self.model.load(self.model_path)
-            self.image_path = os.path.join(
+            self.image_for_classification_path = os.path.join(
                 primary_external_storage_path(), "DCIM/MushroomDetection/photos/1.jpg"
             )
         else:
             self.model = None
-            self.image_path = "photos/1.jpg"
+            self.image_for_classification_path = "photos/1.jpg"
 
         # Основной вертикальный layout
         self.layout = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(10))
@@ -119,7 +117,7 @@ class PredictMushroom(Screen):
 
         # Результирующая метка – чуть меньше по высоте (примерно 10% экрана)
         self.result_label = Label(
-            text="Результат: Ожидание",
+            text="Classifying image...",
             size_hint=(1, 0.1),
             halign="center",
             valign="middle",
@@ -145,49 +143,45 @@ class PredictMushroom(Screen):
         self.add_widget(self.layout)
 
     def on_enter(self):
-        self.update_image()
-        self.start_classification(None)
+        self.start_classification()
 
     def on_pre_leave(self):
-        # delete_image(self.image_path)
+        delete_image(self.image_for_classification_path)
         self.image.clear_widgets()
-        self.image.reload()
+        # self.image.reload()
 
     def update_rect(self, *args):
         self.bg_rect.pos = self.layout.pos
         self.bg_rect.size = self.layout.size
 
-    def start_classification(self, instance):
-        self.result_label.text = "Classifying image..."
+    def start_classification(self):
         threading.Thread(target=self.classify_image).start()
 
     def classify_image(self):
         input_shape = self.model.get_input_shape()
-        img_array = preprocess_image(self.image_path, input_shape)
+        img_array = preprocess_image(self.image_for_classification_path, input_shape)
 
         y = self.model.pred(img_array)  # Предсказываем изображение
 
-        predicted_class = np.argmax(y)  # Определяем индекс самого релевантного класса
-        try:
-            class_label = self.labels[predicted_class]
-        except IndexError:
-            print("ERROR")
-            print(self.labels)
-        mushroom_name = f"Гриб {class_label}"
+        predicted_index_of_class = np.argmax(y)  # Определяем индекс самого релевантного класса
 
-        mushroom_description = f"Гриб распознан с индексом {predicted_class}"
-        self.image_path = f"mushroom_picture/{predicted_class + 1}.jpg"  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
+        predicted_class = self.labels[predicted_index_of_class]
+        mushroom_name = f"Гриб {predicted_class}"
+
+        mushroom_description = f"Гриб распознан с индексом {predicted_index_of_class}"
+        self.image_path = os.path.join(os.getcwd(), f"mushroom_picture/{predicted_class}.jpg")  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
         db.save_mushroom(mushroom_name, self.image_path, mushroom_description)
         # Обновляем результат на экране
-        Clock.schedule_once(lambda dt: self.update_result(f"Результат: {class_label}"))
+        Clock.schedule_once(lambda dt: self.update_result(f"Результат: {predicted_class}"))
 
     def update_result(self, text):
         self.result_label.text = text
-        self.btn_recognize.disabled = True
+        self.update_image()
 
     def update_image(self):
         self.image.source = self.image_path
         self.image.reload()
+
 
     def go_back(self, instance):
         self.manager.current = "main_page"
