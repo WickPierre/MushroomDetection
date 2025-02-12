@@ -44,12 +44,17 @@ Builder.load_string(
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: dp(10)
-
-        RoundedButton:
-            text: "Назад"
-            size_hint: (0.95, 0.15)
-            pos_hint: {'center_x': 0.5}
-            on_release: root.manager.current = "main_page"
+        
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: (1, 0.2)
+            spacing: dp(5)
+            
+            RoundedButton:
+                text: "Назад"
+                size_hint: (0.85, 0.05)
+                pos_hint: {"center_x": 0.5}
+                on_release: root.go_back()
 
             
 
@@ -97,11 +102,16 @@ Builder.load_string(
                 background_color: (0.26, 0.27, 0.33, 1)
                 color: (1, 1, 1, 1)
 
-        RoundedButton:
-            text: "Назад"
-            size_hint: (0.95, 0.15)
-            pos_hint: {'center_x': 0.5}
-            on_release: root.manager.current = "history"
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: (1, 0.2)
+            spacing: dp(5)
+            
+            RoundedButton:
+                text: "Назад"
+                size_hint: (0.85, 0.05)
+                pos_hint: {"center_x": 0.5}
+                on_release: root.go_back()
 """
 )
 
@@ -177,6 +187,9 @@ class HistoryScreen(Screen):
         for mushroom in mushrooms:
             history_list.add_widget(HistoryCard(mushroom=mushroom))
 
+    def go_back(self):
+        self.manager.current = 'main_page'
+
 
 class MushroomDetailScreen(Screen):
     mushroom_title = StringProperty("")
@@ -188,3 +201,6 @@ class MushroomDetailScreen(Screen):
         self.mushroom_title = mushroom.get("name", "Без названия")
         self.mushroom_description = mushroom.get("description", "Описание отсутствует.")
         self.mushroom_photo = mushroom.get("image_path", "default_image.png")
+
+    def go_back(self):
+        self.manager.current = "history"

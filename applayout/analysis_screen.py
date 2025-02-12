@@ -66,7 +66,7 @@ Builder.load_string(
             
             RoundedButton:
                 text: "Назад"
-                size_hint: (0.9, 0.05)
+                size_hint: (0.85, 0.05)
                 pos_hint: {"center_x": 0.5}
                 on_release: root.go_back()
     """
