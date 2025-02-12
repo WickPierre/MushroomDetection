@@ -188,12 +188,12 @@ class PredictMushroom(Screen):
         )
 
     def update_result(self, text):
-        self.result_label.text = text
+        self.ids.result_label.text = text
         self.update_image()
 
     def update_image(self):
-        self.image.source = self.image_path
-        self.image.reload()
+        self.ids.image_display.source = self.image_path
+        self.ids.image_display.reload()
 
     def go_back(self, instance=None):
         self.manager.current = "main_page"
