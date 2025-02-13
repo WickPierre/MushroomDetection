@@ -57,7 +57,9 @@ def init_db():
 def get_mushroom_id(mushroom_name):
     conn = sqlite3.connect("mushrooms.db")
     cursor = conn.cursor()
-    mushroom_id = cursor.execute(f"SELECT id FROM mushroom WHERE name='{mushroom_name}'").fetchone()[0]
+    mushroom_id = cursor.execute(
+        f"SELECT id FROM mushroom WHERE name='{mushroom_name}'"
+    ).fetchone()[0]
     conn.close()
     return mushroom_id
 

@@ -132,7 +132,7 @@ class PredictMushroom(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.model_path = os.path.join(os.getcwd(), "model.tflite")
-        self.labels_path = os.path.join(os.getcwd(), "labels.txt")
+        self.labels_path = os.path.join(os.getcwd(), "mushroom_names.txt")
         self.labels = load_labels(self.labels_path)
         self.image_path = None
 
