@@ -54,9 +54,18 @@ def init_db():
     conn.close()
 
 
-def save_mushroom_scan(mushroom_id):
+def get_mushroom_id(mushroom_name):
     conn = sqlite3.connect("mushrooms.db")
     cursor = conn.cursor()
+    mushroom_id = cursor.execute(f"SELECT id FROM mushroom WHERE name='{mushroom_name}'").fetchone()[0]
+    conn.close()
+    return mushroom_id
+
+
+def save_mushroom_scan(mushroom_name):
+    conn = sqlite3.connect("mushrooms.db")
+    cursor = conn.cursor()
+    mushroom_id = get_mushroom_id(mushroom_name)
     cursor.execute(
         "INSERT INTO mushroom_history (mushroom_id, scan_date) VALUES (?, ?) ",
         (mushroom_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),

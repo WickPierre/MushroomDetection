@@ -175,13 +175,13 @@ class PredictMushroom(Screen):
         )  # Определяем индекс самого релевантного класса
 
         predicted_class = self.labels[predicted_index_of_class]
-        mushroom_name = f"Гриб {predicted_class}"
+        # mushroom_name = f"Гриб {predicted_class}"
 
         mushroom_description = f"Гриб распознан с индексом {predicted_index_of_class}"
         self.image_path = os.path.join(
             os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
         )  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
-        db.save_mushroom(mushroom_name, self.image_path, mushroom_description)
+        db.save_mushroom_scan(predicted_class)
         # Обновляем результат на экране
         Clock.schedule_once(
             lambda dt: self.update_result(f"Результат: {predicted_class}")
