@@ -1,95 +1,34 @@
-"""
-If you need new db data
-"""
-
 import sqlite3
+import random
+from datetime import datetime, timedelta
 
-conn = sqlite3.connect("mushrooms.db")
+# Подключение к базе данных
+db_path = "mushrooms.db"  # Укажите путь к вашему файлу базы
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-mushroom_data = [
-    (name := "Agaricus_bisporus".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Amanita_muscaria".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Boletus_edulis".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Cantharellus_cibarius".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Cortinarius_rubellus".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Gyromitra_esculenta".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Lactarius_deliciosus".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Morchella_esculenta".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Pleurotus_ostreatus".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-    (name := "Russula_emetica".lower(), f"mushroom_picture/{name}.jpg", "2025-02-09"),
-]
+# Получение списка всех доступных грибов
+cursor.execute("SELECT id FROM mushroom;")
+mushroom_ids = [row[0] for row in cursor.fetchall()]
 
+# Генерация случайных 10 записей в mushroom_history
+random_mushrooms = random.sample(mushroom_ids, min(10, len(mushroom_ids)))
+mushroom_history_data = []
 
-mushroom_history_data = [
-    (
-        name := "Agaricus_bisporus".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Съедобный, широко используемый в кулинарии."
-        * 100,  # Текст прокручивается без проблем
-    ),
-    (
-        name := "Amanita_muscaria".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Ядовитый, содержит психоактивные вещества.",
-    ),
-    (
-        name := "Boletus_edulis".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Высоко ценится в кулинарии, обладает насыщенным вкусом.",
-    ),
-    (
-        name := "Cantharellus_cibarius".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Ароматный, съедобный гриб, любимый в европейской кухне.",
-    ),
-    (
-        name := "Cortinarius_rubellus".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Очень ядовитый, вызывает тяжелое отравление.",
-    ),
-    (
-        name := "Gyromitra_esculenta".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Токсичный, но в некоторых странах употребляется после специальной обработки.",
-    ),
-    (
-        name := "Lactarius_deliciosus".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Съедобный гриб с пикантным вкусом.",
-    ),
-    (
-        name := "Morchella_esculenta".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Высоко ценится в кулинарии, особенно во французской кухне.",
-    ),
-    (
-        name := "Pleurotus_ostreatus".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Популярный съедобный гриб, легко выращивается.",
-    ),
-    (
-        name := "Russula_emetica".lower(),
-        f"mushroom_picture/{name}.jpg",
-        "2025-02-09",
-        "Ядовитый гриб, вызывает рвоту и отравление.",
-    ),
-]
+for mushroom_id in random_mushrooms:
+    random_time = datetime.now() - timedelta(
+        days=random.randint(0, 30),
+        hours=random.randint(0, 23),
+        minutes=random.randint(0, 59),
+        seconds=random.randint(0, 59),
+    )
+    formatted_time = random_time.strftime("%Y-%m-%d %H:%M:%S")
+    mushroom_history_data.append((mushroom_id, formatted_time))
+
+# Вставка данных в mushroom_history
 cursor.executemany(
-    "INSERT INTO mushroom_history (name, image_path, scan_date, description) VALUES (?, ?, ?, ?);",
+    "INSERT INTO mushroom_history (mushroom_id, scan_date) VALUES (?, ?);",
     mushroom_history_data,
 )
-
 conn.commit()
 conn.close()
-
-"Данные успешно добавлены в базу."

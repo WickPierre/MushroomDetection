@@ -188,7 +188,7 @@ class HistoryScreen(Screen):
             history_list.add_widget(HistoryCard(mushroom=mushroom))
 
     def go_back(self):
-        self.manager.current = 'main_page'
+        self.manager.current = "main_page"
 
 
 class MushroomDetailScreen(Screen):
