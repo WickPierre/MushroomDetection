@@ -27,7 +27,7 @@ Builder.load_string(
             Rectangle:
                 pos: self.pos
                 size: self.size
-                source: 'back_of_design.jpg'
+                source: os.path.join('icons', 'back_of_design.jpg')
 
         Label:
             text: "История сканирований"
@@ -71,7 +71,7 @@ Builder.load_string(
             Rectangle:
                 pos: self.pos
                 size: self.size
-                source: 'back_of_design.jpg'
+                source: os.path.join('icons', 'back_of_design.jpg')
 
         Label:
             id: mushroom_title

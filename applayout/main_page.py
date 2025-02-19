@@ -5,7 +5,7 @@ from applayout.models import RoundedButton  # Импортируем наш ка
 Builder.load_string(
     """
 #:import dp kivy.metrics.dp
-
+#:import os os
 <RoundedButton>:
     font_size: self.height * 0.15
 
@@ -20,7 +20,7 @@ Builder.load_string(
             Rectangle:
                 pos: self.pos
                 size: self.size  # Фиксированный размер фона
-                source: 'back_of_design.jpg'  # Указываем путь к изображению фона
+                source: os.path.join('icons', 'back_of_design.jpg')  # Указываем путь к изображению фона
 
         Widget:
             size_hint_y: 0.3

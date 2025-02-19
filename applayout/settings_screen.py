@@ -7,6 +7,7 @@ import database as db  # Импортируем функцию очистки и
 
 Builder.load_string(
     """
+    #:import os os
 <SettingsScreen>:
     canvas.before:
         Color:
@@ -14,7 +15,7 @@ Builder.load_string(
         Rectangle:
             pos: self.pos
             size: self.size
-            source: 'back_of_design.jpg'
+            source: os.path.join('icons', 'back_of_design.jpg')
 
     AnchorLayout:
         anchor_x: "center"

@@ -33,7 +33,7 @@ else:
 Builder.load_string(
     """
 #:import get_color_from_hex kivy.utils.get_color_from_hex
-
+#:import os os
 <PredictMushroom>:
     name: "predict_mushroom"
     BoxLayout:
@@ -46,7 +46,7 @@ Builder.load_string(
             Rectangle:
                 pos: self.pos
                 size: self.size
-                source: 'back_of_design.jpg'
+                source: os.path.join('icons', 'back_of_design.jpg')
 
         Image:
             id: image_display

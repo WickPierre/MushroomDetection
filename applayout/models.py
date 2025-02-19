@@ -4,6 +4,7 @@ from kivy.uix.image import Image
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import Color, RoundedRectangle
 from kivy.utils import get_color_from_hex
+import os
 
 
 class RoundedButton(ButtonBehavior, Label):
@@ -15,7 +16,7 @@ class RoundedButton(ButtonBehavior, Label):
         self.size = (220, 56)
         self.halign = "center"
         self.valign = "middle"
-        self.font_name = "srift.ttf"
+        self.font_name = os.path.join("icons", "srift.ttf")
         self.color = get_color_from_hex("#FFFFFF")
         self.bold = True
 
