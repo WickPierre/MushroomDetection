@@ -10,10 +10,11 @@ Builder.load_string(
 <SettingsScreen>:
     canvas.before:
         Color:
-            rgba: (0.26, 0.27, 0.33, 1)
+            rgba: (1, 1, 1, 1)
         Rectangle:
             pos: self.pos
             size: self.size
+            source: 'back_of_design.jpg'
 
     AnchorLayout:
         anchor_x: "center"
@@ -24,6 +25,7 @@ Builder.load_string(
             width: root.width * 0.8
             height: root.height * 0.35
             spacing: dp(20)
+            
             RoundedButton:
                 text: "Очистить историю"
                 size_hint: (None, None)

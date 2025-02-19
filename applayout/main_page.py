@@ -7,11 +7,8 @@ Builder.load_string(
 #:import dp kivy.metrics.dp
 
 <RoundedButton>:
-    # Здесь можно задать дополнительные свойства,
-    # не переопределяя логику отрисовки из Python.
     font_size: self.height * 0.15
 
-    
 <MainPage>:
     BoxLayout:
         orientation: 'vertical'
@@ -19,12 +16,12 @@ Builder.load_string(
         spacing: dp(20)
         canvas.before:
             Color:
-                rgba: (0.26, 0.27, 0.33, 1)
+                rgba: (1, 1, 1, 1)  # Белый цвет как запасной фон
             Rectangle:
                 pos: self.pos
-                size: self.size
+                size: self.size  # Фиксированный размер фона
+                source: 'back_of_design.jpg'  # Указываем путь к изображению фона
 
-        # Виджет для отступа сверху (30% высоты)
         Widget:
             size_hint_y: 0.3
 

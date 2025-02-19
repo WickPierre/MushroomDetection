@@ -23,10 +23,11 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: (0.26, 0.27, 0.33, 1)
+                rgba: (1, 1, 1, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
+                source: 'back_of_design.jpg'
 
         Label:
             text: "История сканирований"
@@ -66,10 +67,11 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: (0.26, 0.27, 0.33, 1)
+                rgba: (1, 1, 1, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
+                source: 'back_of_design.jpg'
 
         Label:
             id: mushroom_title
@@ -78,9 +80,14 @@ Builder.load_string(
             height: dp(40)
             font_size: "20sp"
             halign: "center"
-            background_color: (0.26, 0.27, 0.33, 1)
             color: (1, 1, 1, 1)
-
+            canvas.before:
+                Color:
+                    rgba: get_color_from_hex("#002137")
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [20]
         Image:
             id: mushroom_image
             source: os.path.join(os.getcwd(), root.mushroom_photo)
@@ -90,17 +97,29 @@ Builder.load_string(
 
         ScrollView:
             size_hint_y: 0.4
-            Label:
-                id: mushroom_description
-                text: root.mushroom_description
+            BoxLayout:
                 size_hint_y: None
-                height: self.texture_size[1]
-                font_size: "16sp"
-                halign: "left"
-                valign: "top"
-                text_size: self.width, None
-                background_color: (0.26, 0.27, 0.33, 1)
-                color: (1, 1, 1, 1)
+                height: self.minimum_height
+                padding: dp(10)
+
+                Label:
+                    id: mushroom_description
+                    text: root.mushroom_description
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(20)
+                    font_size: "16sp"
+                    halign: "left"
+                    valign: "top"
+                    text_size: self.width, None
+                    color: (1, 1, 1, 1)
+                    padding: dp(10)
+                    canvas.before:
+                        Color:
+                            rgba: get_color_from_hex("#002137")
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [20]
 
         BoxLayout:
             orientation: "vertical"
@@ -136,7 +155,7 @@ class HistoryCard(ButtonBehavior, BoxLayout):
         # Отображаем название гриба (с выделением) и дату сканирования
         self.add_widget(
             Label(
-                text=f"[b]{mushroom.get('name', 'Без названия')}[/b]",
+                text=f"[b]{mushroom.get('name', 'Без названия').replace('_', ' ')}[/b]",
                 markup=True,
                 size_hint_y=None,
                 height=dp(30),
@@ -198,7 +217,7 @@ class MushroomDetailScreen(Screen):
 
     def set_details(self, mushroom):
         """Устанавливает данные для детального отображения выбранного гриба."""
-        self.mushroom_title = mushroom.get("name", "Без названия")
+        self.mushroom_title = mushroom.get("name", "Без названия").replace("_", " ")
         self.mushroom_description = mushroom.get("description", "Описание отсутствует.")
         self.mushroom_photo = mushroom.get("image_path", "default_image.png")
 

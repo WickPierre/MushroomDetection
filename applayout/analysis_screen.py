@@ -32,6 +32,8 @@ else:
 
 Builder.load_string(
     """
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
 <PredictMushroom>:
     name: "predict_mushroom"
     BoxLayout:
@@ -40,10 +42,11 @@ Builder.load_string(
         spacing: dp(10)
         canvas.before:
             Color:
-                rgba: (0.26, 0.27, 0.33, 1)
+                rgba: (1, 1, 1, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
+                source: 'back_of_design.jpg'
 
         Image:
             id: image_display
@@ -184,7 +187,9 @@ class PredictMushroom(Screen):
         db.save_mushroom_scan(predicted_class)
         # Обновляем результат на экране
         Clock.schedule_once(
-            lambda dt: self.update_result(f"Результат: {predicted_class}")
+            lambda dt: self.update_result(
+                f"Результат: {predicted_class}"
+            )  # predicted_class.split('_')
         )
 
     def update_result(self, text):
