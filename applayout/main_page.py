@@ -6,6 +6,8 @@ Builder.load_string(
     """
 #:import dp kivy.metrics.dp
 #:import os os
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
 <RoundedButton>:
     font_size: self.height * 0.15
 
@@ -16,15 +18,35 @@ Builder.load_string(
         spacing: dp(20)
         canvas.before:
             Color:
-                rgba: (1, 1, 1, 1)  # Белый цвет как запасной фон
+                rgba: (1, 1, 1, 1)
             Rectangle:
                 pos: self.pos
-                size: self.size  # Фиксированный размер фона
-                source: os.path.join('icons', 'back_of_design.jpg')  # Указываем путь к изображению фона
+                size: self.size
+                source: os.path.join('icons', 'back_of_design.jpg')
+
+        AnchorLayout:
+            anchor_y: 'bottom'
+            size_hint_y: 0.25
+            Label:
+                text: "Mushroom Detector"
+                font_name: os.path.join('icons', 'srift.ttf')
+                font_size: dp(36)
+                size_hint: None, None
+                size: self.texture_size
+                halign: 'center'
+                color: (1, 1, 1, 1)
+                canvas.before:
+                    Color:
+                        rgba: (0, 0, 0, 0.5)
+                    RoundedRectangle:
+                        pos: (self.x - dp(10), self.y - dp(10))
+                        size: (self.width + dp(20), self.height + dp(20))
+                        radius: [20]
 
         Widget:
             size_hint_y: 0.3
 
+                     
         RoundedButton:
             text: "Распознать гриб"
             size_hint: (0.85, 0.15)
@@ -42,7 +64,7 @@ Builder.load_string(
             size_hint: (0.85, 0.15)
             pos_hint: {'center_x': 0.5}
             on_release: root.manager.current = 'settings'
-"""
+    """
 )
 
 

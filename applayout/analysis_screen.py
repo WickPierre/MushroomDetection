@@ -173,23 +173,22 @@ class PredictMushroom(Screen):
 
         y = self.model.pred(img_array)  # Предсказываем изображение
 
-        predicted_index_of_class = np.argmax(
-            y
-        )  # Определяем индекс самого релевантного класса
+        predicted_index_of_class = np.argmax(y)
 
-        predicted_class = self.labels[predicted_index_of_class]
-        # mushroom_name = f"Гриб {predicted_class}"
+        if predicted_index_of_class <= 0.3:
+            predicted_class = "На картинке нет грибов"
+            self.image_path = os.path.join(os.getcwd(), "mushroom_picture/nothing.jpg")
+        else:
+            predicted_index_of_class = np.argmax(y)
+            predicted_class = self.labels[predicted_index_of_class]
+            self.image_path = os.path.join(
+                os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
+            )
+            db.save_mushroom_scan(predicted_class)
 
-        mushroom_description = f"Гриб распознан с индексом {predicted_index_of_class}"
-        self.image_path = os.path.join(
-            os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
-        )  # Нужно убедиться, что все хорошо с нумерацией, т.к картинки начинаются с 2
-        db.save_mushroom_scan(predicted_class)
         # Обновляем результат на экране
         Clock.schedule_once(
-            lambda dt: self.update_result(
-                f"Результат: {predicted_class}"
-            )  # predicted_class.split('_')
+            lambda dt: self.update_result(f"Результат: {predicted_class}")
         )
 
     def update_result(self, text):
