@@ -41,15 +41,16 @@ def init_db():
         descriptions = f.read().split("?????")
 
     descriptions = [desc.strip() for desc in descriptions if desc.strip()]
-
+    e = 1
     for i, mushroom in enumerate(mushrooms):
         description = (
             descriptions[i] if i < len(descriptions) else "Описание отсутствует."
         )
         cursor.execute(
             "INSERT OR IGNORE INTO mushroom (name, image_path, description) VALUES (?, ?, ?)",
-            (mushroom, f"mushroom_picture/{mushroom}.jpg", description),
+            (mushroom, f"mushroom_picture/{e}.jpg", description),
         )
+        e += 1
     conn.commit()
     conn.close()
 

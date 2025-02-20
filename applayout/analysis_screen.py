@@ -174,21 +174,22 @@ class PredictMushroom(Screen):
         y = self.model.pred(img_array)  # Предсказываем изображение
 
         predicted_index_of_class = np.argmax(y)
+        probability = y[0, predicted_index_of_class]
 
-        if predicted_index_of_class <= 0.3:
-            predicted_class = "Гриб не распознан. Убедитесь, что он чётко виден, и попробуйте ещё раз!"
-            self.image_path = os.path.join(os.getcwd(), "mushroom_picture/nothing.jpg")
+        if probability <= 0.3:
+            predicted_class = "Гриб не распознан"
+            self.image_path = os.path.join(os.getcwd(), "mushroom_picture/nothing.png")
         else:
-            predicted_index_of_class = np.argmax(y)
             predicted_class = self.labels[predicted_index_of_class]
+            index = db.get_mushroom_id(predicted_class)
             self.image_path = os.path.join(
-                os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
+                os.getcwd(), f"mushroom_picture/{index}.jpg"
             )
             db.save_mushroom_scan(predicted_class)
 
         # Обновляем результат на экране
         Clock.schedule_once(
-            lambda dt: self.update_result(f"Результат: {predicted_class}")
+            lambda dt: self.update_result(f"Результат: {predicted_class.replace('_', ' ')}")
         )
 
     def update_result(self, text):
