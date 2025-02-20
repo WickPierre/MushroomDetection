@@ -176,7 +176,7 @@ class PredictMushroom(Screen):
         predicted_index_of_class = np.argmax(y)
 
         if predicted_index_of_class <= 0.3:
-            predicted_class = "На картинке нет грибов"
+            predicted_class = "Гриб не распознан. Убедитесь, что он чётко виден, и попробуйте ещё раз!"
             self.image_path = os.path.join(os.getcwd(), "mushroom_picture/nothing.jpg")
         else:
             predicted_index_of_class = np.argmax(y)
