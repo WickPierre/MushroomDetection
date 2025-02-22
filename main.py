@@ -16,6 +16,9 @@ if platform == "android":
     from jnius import autoclass
     from android.runnable import run_on_ui_thread
     from android import mActivity
+    # from kivy.config import Config
+    #
+    # Config.set('kivy', 'show_startup_logo', '0')
 
     View = autoclass("android.view.View")
 
