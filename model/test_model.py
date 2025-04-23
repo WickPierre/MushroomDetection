@@ -9,10 +9,12 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image as PILImage
 
+
 # Загрузка меток классов
 def load_labels(label_path):
     with open(label_path, "r") as f:
         return [line.strip() for line in f.readlines()]
+
 
 # Размер входного изображения (зависит от вашей модели)
 INPUT_SIZE = (224, 224)
@@ -35,11 +37,15 @@ class ClassifierApp(App):
         self.layout.add_widget(self.image)
 
         # Метка для отображения результата
-        self.result_label = Label(text="Select an image to classify", size_hint=(1, 0.2), font_size="18sp")
+        self.result_label = Label(
+            text="Select an image to classify", size_hint=(1, 0.2), font_size="18sp"
+        )
         self.layout.add_widget(self.result_label)
 
         # Кнопка для классификации изображения
-        self.classify_button = Button(text="Classify Image", size_hint=(1, 0.1), on_press=self.classify_image)
+        self.classify_button = Button(
+            text="Classify Image", size_hint=(1, 0.1), on_press=self.classify_image
+        )
         self.layout.add_widget(self.classify_button)
 
         return self.layout
@@ -72,7 +78,9 @@ class ClassifierApp(App):
             predicted_probability = output_data[0, predicted_class_idx]
 
             # Обновление интерфейса с результатами
-            self.result_label.text = f"Class: {predicted_class_name}\nProbability: {predicted_probability}"
+            self.result_label.text = (
+                f"Class: {predicted_class_name}\nProbability: {predicted_probability}"
+            )
 
         else:
             self.result_label.text = "No image selected!"

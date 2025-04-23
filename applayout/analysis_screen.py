@@ -61,6 +61,12 @@ Builder.load_string(
             halign: "center"
             valign: "middle"
             color: (1, 1, 1, 1)
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.8  # Белый фон с прозрачностью
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
 
         BoxLayout:
             orientation: "vertical"
@@ -100,7 +106,6 @@ class TensorFlowModel:
             self.allocate_tensors()
 
     def pred(self, x):
-        # Предполагается одна входная и одна выходная переменная
         input = ByteBuffer.wrap(x.tobytes())
         output = TensorBuffer.createFixedSize(self.output_shape, self.output_type)
         self.interpreter.run(input, output.getBuffer().rewind())
@@ -108,26 +113,22 @@ class TensorFlowModel:
 
 
 def delete_image(image_path):
-    if os.path.exists(image_path):  # Проверяем, существует ли файл
-        os.remove(image_path)  # Удаляем файл
+    if os.path.exists(image_path):
+        os.remove(image_path)
         print(f"Файл {image_path} успешно удален.")
     else:
         print(f"Файл {image_path} не существует.")
 
 
-# Загрузка меток классов
 def load_labels(label_path):
     with open(label_path, "r") as f:
         return [line.strip() for line in f.readlines()]
 
 
-# Преобразование изображения в формат, который принимает модель
 def preprocess_image(image_path, input_shape):
     img = PILImage.open(image_path).convert("RGB")
     img = img.resize((input_shape[1], input_shape[2]))
     img = np.expand_dims(np.array(img, dtype=np.float32) / 255.0, axis=0)
-    # img = np.array(img).astype(np.float32)  # / 255.0 Нормализация
-    # img = np.expand_dims(img, axis=0)  # Добавляем batch размерность
     return img
 
 
@@ -138,6 +139,81 @@ class PredictMushroom(Screen):
         self.labels_path = os.path.join(os.getcwd(), "mushroom_names.txt")
         self.labels = load_labels(self.labels_path)
         self.image_path = None
+        self.highlight_color = (1, 1, 1, 1)  # Белый по умолчанию
+
+        self.edible = {
+            "Грушевидный_дождевик",
+            "Опёнок_северный",
+            "Белый_гриб",
+            "Боровик_сетчатый",
+            "Лисичка_обыкновенная",
+            "Опёнок_зимний",
+            "Польский_гриб",
+            "Опёнок_летний",
+            "Рыжик_настоящий",
+            "Волнушка_розовая",
+            "Груздь_перечный",
+            "Подосиновик_белоножковый",
+            "Подосиновик_красный",
+            "Подберёзовик_обыкновенный",
+            "Подосиновик_жёлто-бурый",
+            "Дождевик_жемчужный",
+            "Гриб-зонтик_пёстрый",
+            "Вёшенка_обыкновенная",
+            "Вёшенка_лёгочная",
+            "Маслёнок_зернистый",
+            "Маслёнок_лиственничный",
+            "Маслёнок_обыкновенный",
+        }
+
+        self.poisonous = {
+            "Мухомор_поганковидный",
+            "Мухомор_красный",
+            "Мухомор_пантерный",
+            "Мухомор_серо-розовый",
+            "Трутовик_чешуйчатый",
+            "Говорушка_дымчатая",
+            "Кольтриция_многолетняя",
+            "Навозник_рассеянный",
+            "Навозник_мерцающий",
+            "Навозник_серый",
+            "Навозник_белый",
+            "Дедалеопсис_бугристый",
+            "Дедалеопсис_трёхцветный",
+            "Трутовик_настоящий",
+            "Трутовик_берёзовый",
+            "Трутовик_окаймлённый",
+            "Трутовик_плоский",
+            "Строчок_обыкновенный",
+            "Строчок_гигантский",
+            "Строчок_остроконечный",
+            "Ложная_лисичка",
+            "Ложноопёнок_серно-жёлтый",
+            "Ложноопёнок_кирпично-красный",
+            "Трутовик_серно-жёлтый",
+            "Леписта_голая",
+            "Мерулиус_дрожащий",
+            "Мутинус_Равенеля",
+            "Панеллюс_вяжущий",
+            "Свинушка_тонкая",
+            "Весёлка_обыкновенная",
+            "Трутовик_ложный",
+            "Трутовик_осиновый",
+            "Чешуйчатка_золотистая",
+            "Чешуйчатка_обыкновенная",
+            "Саркодонция_поздняя",
+            "Саркосцифа_австрийская",
+            "Саркосома_шаровидная",
+            "Строфария_сине-зелёная",
+            "Траметес_жёстковолосистый",
+            "Траметес_охряный",
+            "Траметес_разноцветный",
+            "Дрожалка_оранжевая",
+            "Трихаптум_двуформенный",
+            "Рядовка_жёлто-красная",
+            "Урнула_кратеровидная",
+            "Сморчковая_шапочка",
+        }
 
         if platform == "android":
             self.model = TensorFlowModel()
@@ -154,46 +230,64 @@ class PredictMushroom(Screen):
 
     def on_pre_leave(self):
         delete_image(self.image_for_classification_path)
-        self.ids.image_display.source = (
-            ""  # Для того, чтобы кнопка заработала, пришлось сделать так
-        )
-        # self.image.clear_widgets()
-        # self.image.reload()
-
-    def update_rect(self, *args):
-        self.bg_rect.pos = self.layout.pos
-        self.bg_rect.size = self.layout.size
+        self.ids.image_display.source = ""
+        self.highlight_color = (1, 1, 1, 1)  # Сброс цвета
 
     def start_classification(self):
         threading.Thread(target=self.classify_image).start()
 
     def classify_image(self):
-        input_shape = self.model.get_input_shape()
-        img_array = preprocess_image(self.image_for_classification_path, input_shape)
-
-        y = self.model.pred(img_array)  # Предсказываем изображение
-
-        predicted_index_of_class = np.argmax(y)
-
-        if predicted_index_of_class <= 0.3:
-            predicted_class = "Гриб не распознан. Убедитесь, что он чётко виден, и попробуйте ещё раз!"
-            self.image_path = os.path.join(os.getcwd(), "mushroom_picture/nothing.jpg")
-        else:
-            predicted_index_of_class = np.argmax(y)
-            predicted_class = self.labels[predicted_index_of_class]
-            self.image_path = os.path.join(
-                os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
+        try:
+            input_shape = self.model.get_input_shape()
+            img_array = preprocess_image(
+                self.image_for_classification_path, input_shape
             )
-            db.save_mushroom_scan(predicted_class)
+            y = self.model.pred(img_array)
+            predicted_index = np.argmax(y)
 
-        # Обновляем результат на экране
-        Clock.schedule_once(
-            lambda dt: self.update_result(f"Результат: {predicted_class}")
-        )
+            if max(y[0]) < 0.3:
+                predicted_class = "Гриб не распознан. Убедитесь, что он чётко виден!"
+                self.image_path = os.path.join(
+                    os.getcwd(), "mushroom_picture/nothing.jpg"
+                )
+                self.highlight_color = (1, 1, 0, 0.3)  # Желтый для неопределенности
+            else:
+                predicted_class = self.labels[predicted_index]
+                self.image_path = os.path.join(
+                    os.getcwd(), f"mushroom_picture/{predicted_class}.jpg"
+                )
+                db.save_mushroom_scan(predicted_class)
+
+                # Определение цвета
+                if predicted_class in self.edible:
+                    self.highlight_color = (0, 1, 0, 0.3)  # Зеленый
+                elif predicted_class in self.poisonous:
+                    self.highlight_color = (1, 0, 0, 0.3)  # Красный
+                else:
+                    self.highlight_color = (1, 1, 1, 0.3)  # Светло-серый
+
+            Clock.schedule_once(
+                lambda dt: self.update_result(f"Результат: {predicted_class}")
+            )
+        except Exception as e:
+            Clock.schedule_once(
+                lambda dt: self.update_result(f"Ошибка классификации: {str(e)}")
+            )
 
     def update_result(self, text):
         self.ids.result_label.text = text
+        self.update_background()
         self.update_image()
+        # Привязка к изменениям размера/позиции
+        self.ids.result_label.bind(
+            pos=self.update_background, size=self.update_background
+        )
+
+    def update_background(self, *args):
+        self.ids.result_label.canvas.before.clear()
+        with self.ids.result_label.canvas.before:
+            Color(*self.highlight_color)
+            Rectangle(pos=self.ids.result_label.pos, size=self.ids.result_label.size)
 
     def update_image(self):
         self.ids.image_display.source = self.image_path
